@@ -1,0 +1,180 @@
+# I don't use this directly as I use the UI still, but it's good to keep an offline copy.
+background: center / cover no-repeat url("/local/imgs/floor-background.png") fixed
+resources:
+  - type: module
+    url: /community_plugin/weather-card/weather-card.js
+  - type: module
+    url: /community_plugin/mini-media-player/mini-media-player-bundle.js
+  - type: module
+    url: /community_plugin/mini-graph-card/mini-graph-card-bundle.js
+  - type: module
+    url: /community_plugin/gauge-card/gauge-card.js
+  - type: js
+    url: /community_plugin/bar-card/bar-card.js
+  - type: module
+    url: /community_plugin/button-card/button-card.js
+title: Colly's Kaya
+views:
+  - badges:
+      - device_tracker.honor_6a
+      - device_tracker.colins_iphone
+      - sensor.dark_sky_apparent_temperature
+      - sensor.dark_sky_precip_probability
+      - sensor.speedtest_download
+      - sensor.speedtest_upload
+      - sensor.speedtest_ping
+    cards:
+      - entities:
+          - entity: switch.standard_lamp
+          - entity: light.desk
+        theme: default
+        title: Switch
+        type: entities
+      - entities:
+          - automation.turn_desk_light_off_at_18_30
+          - automation.turn_lamp_on_before_sunset_if_someone_is_home
+          - automation.turn_desk_light_on_before_sunset_if_col_home
+          - automation.flash_desk_light_at_18_05
+        title: Automation
+        type: entities
+      - entity: weather.dark_sky
+        name: Earley
+        type: 'custom:weather-card'
+      - aspect_ratio: 70%
+        type: iframe
+        url: >-
+          https://embed.windy.com/embed2.html?lat=51.529&lon=-1.296&zoom=7&level=surface&overlay=rain&menu=&message=true&marker=true&calendar=&pressure=true&type=map&location=coordinates&detail=&detailLat=51.510&detailLon=-0.130&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1
+      - entity: media_player.office
+        hide:
+          icon: true
+          power: true
+          source: true
+        speaker_group:
+          entities:
+            - entity_id: media_player.office
+              name: Office
+            - entity_id: media_player.lounge
+              name: Lounge
+            - entity_id: media_player.bedroom
+              name: Bedroom
+          platform: sonos
+          show_group_count: true
+        type: 'custom:mini-media-player'
+      - cards:
+          - artwork: cover
+            entity: media_player.office
+            hide:
+              icon: true
+              mute: false
+              power: true
+            info: short
+            name: Office
+            type: 'custom:mini-media-player'
+          - artwork: cover
+            entity: media_player.bedroom
+            hide:
+              icon: true
+              mute: false
+              power: true
+            info: short
+            type: 'custom:mini-media-player'
+          - artwork: cover
+            entity: media_player.lounge
+            hide:
+              icon: true
+              mute: false
+              power: true
+            info: short
+            type: 'custom:mini-media-player'
+        type: vertical-stack
+    icon: 'mdi:home'
+    path: default_view
+    title: Home
+  - badges: []
+    cards:
+      - entities:
+          - entity: sensor.load_1m
+            name: 1m
+          - entity: sensor.load_5m
+            name: 5m
+          - entity: sensor.load_15m
+            name: 15m
+        hours_to_show: 2
+        title: System Load
+        type: history-graph
+      - color_thresholds:
+          - color: green
+            value: 0
+          - color: '#d35400'
+            value: 70
+          - color: '#c0392b'
+            value: 90
+        entities:
+          - sensor.cpu_temperature
+        max: 100
+        min: 0
+        name: CPU Temperature
+        show:
+          labels: true
+        type: 'custom:mini-graph-card'
+        unit: °C
+      - columns: 4
+        entities:
+          - entity: sensor.load_1m
+          - entity: sensor.load_5m
+          - entity: sensor.load_15m
+          - entity: sensor.memory_use_percent
+        title: System Info
+        type: glance
+      - detail: 2
+        entity: sensor.home_assistant_v2_db
+        graph: line
+        hours_to_show: 24
+        name: Hassio Database Size
+        type: sensor
+      - cards:
+          - entities:
+              - sensor.speedtest_download
+            icon: 'mdi:download'
+            name: Download Speed
+            type: 'custom:mini-graph-card'
+          - entities:
+              - sensor.speedtest_upload
+            icon: 'mdi:upload'
+            name: Upload Speed
+            type: 'custom:mini-graph-card'
+        hour24: true
+        hours_to_show: 24
+        title: Internet Speed
+        type: horizontal-stack
+      - detail: 0
+        entity: sensor.rpi_power_status
+        type: sensor
+      - entities:
+          - entity: switch.pihole_switch
+            icon: 'mdi:pi-hole'
+            name: Pi-Hole Ads Block State
+          - decimal: 0
+            entity: sensor.pi_hole_ads_blocked_today
+            max: 10000
+            title: Ads Blocked Today
+            title_position: inside
+            type: 'custom:bar-card'
+          - decimal: 0
+            entity: sensor.pi_hole_dns_queries_today
+            max: 100000
+            title: DNS Queries
+            title_position: inside
+            type: 'custom:bar-card'
+          - decimal: 0
+            entity: sensor.pi_hole_dns_unique_clients
+            title: Pi-Hole DNS Unique Clients
+            title_position: inside
+            type: 'custom:bar-card'
+        show_header_toggle: false
+        title: Pi-Hole
+        type: entities
+    icon: 'mdi:server'
+    panel: false
+    path: system
+    title: System
