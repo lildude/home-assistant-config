@@ -1,0 +1,32 @@
+      - cards:
+          - entity: sensor.tesla_model_3_mileage_sensor
+            image: /local/MyTesla.png
+            name: Mileage
+            title: Tesla Model 3
+            type: picture-entity
+          - entity: sensor.tesla_model_3_battery_sensor
+            max: 100
+            min: 0
+            severity:
+              green: 50
+              red: 0
+              yellow: 20
+            title: Battery
+            type: gauge
+          - entities:
+              - sensor.tesla_model_3_range_sensor
+              - switch.tesla_model_3_charger_switch
+              - binary_sensor.tesla_model_3_charger_sensor
+            type: glance
+          - entities:
+              - entity: sensor.tesla_model_3_temperature_sensor_inside
+                name: Inside
+              - entity: sensor.tesla_model_3_temperature_sensor_outside
+                name: Outside
+              - entity: climate.tesla_model_3_hvac_climate_system
+            type: glance
+        type: vertical-stack
+      - entities:
+          - sensor.tesla_model_3_battery_sensor
+        title: Battery Status
+        type: history-graph
