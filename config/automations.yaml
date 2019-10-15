@@ -1,0 +1,67 @@
+- id: light_on_sunset_if_home
+  alias: Turn lamp on before sunset if someone is home
+  trigger:
+  - event: sunset
+    offset: -00:40:00
+    platform: sun
+  condition:
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: person.colin_2
+      state: home
+    - condition: state
+      entity_id: person.claire_2
+      state: home
+  action:
+  - entity_id: switch.standard_lamp
+    service: switch.turn_on
+  initial_state: true
+- id: desk_light_on_sunset_if_home
+  alias: Turn desk light on before sunset if Col home
+  initial_state: true
+  trigger:
+  - event: sunset
+    offset: -00:30:00
+    platform: sun
+  condition:
+  - condition: state
+    entity_id: person.colin_2
+    state: home
+  - condition: time
+    before: '18:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  action:
+  - entity_id: light.desk
+    service: light.turn_on
+- id: desk_light_off_at_1830
+  alias: Turn desk light off at 18:30
+  initial_state: true
+  trigger:
+  - at: '18:30'
+    platform: time
+  condition: []
+  action:
+  - entity_id: light.desk
+    service: light.turn_off
+- id: desk_light_flash_at_1805
+  alias: Flash desk light at 18:05
+  trigger:
+  - at: '18:05'
+    platform: time
+  condition:
+  - condition: state
+    entity_id: person.colin_2
+    state: home
+  action:
+  - data:
+      color_name: blue
+      cycles: 3
+      entity_id: light.desk
+      period: 1
+    service: light.lifx_effect_pulse
