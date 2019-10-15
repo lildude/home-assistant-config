@@ -1,0 +1,178 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret latitude
+  longitude: !secret longitude
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 57
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  temperature_unit: C
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: Europe/London
+  whitelist_external_dirs:
+    - /config
+  # Customization file
+  customize: !include customize.yaml
+
+  packages: !include_dir_named packages
+
+# Enables system health info on the Developer Tools page.
+system_health:
+
+# Show links to resources in log and frontend
+# introduction:
+
+# Enables the frontend
+frontend:
+
+# Enables configuration UI
+config:
+
+http:
+  #cors_allowed_origins:
+  #  - https://hassio.local:8123
+  base_url: !secret base_url
+  ssl_certificate: /ssl/fullchain.pem
+  ssl_key: /ssl/privkey.pem
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  include_used_components: true
+
+# Discover some devices automatically
+discovery:
+
+# Track peeps
+person:
+
+device_tracker:
+  - platform: bt_smarthub
+    host: 192.168.1.254
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time
+history:
+
+# Control what is saved to the database and when the DB is purged
+recorder:
+  purge_keep_days: 7
+  purge_interval: 1
+  exclude:
+    domains:
+      - automation
+      - weblink
+      - updater
+      - group
+      - script
+      - switch
+      - zone
+      - zwave
+      - media_player
+    entities:
+      - sun.sun
+      - sensor.date
+      - sensor.time
+      - sensor.last_boot
+
+# View all events in a logbook
+logbook:
+
+# Enables a map showing the location of tracked devices
+map:
+
+# Track the sun
+sun:
+
+# Get pihole stats
+pi_hole:
+  host: localhost:4865
+
+# Weather prediction & speedtest
+sensor:
+  - platform: darksky
+    api_key: !secret darksky_api_key
+    scan_interval: '01:00'
+    monitored_conditions:
+      - apparent_temperature
+      - precip_probability
+  - platform: systemmonitor
+    resources:
+      - type: load_1m
+      - type: load_5m
+      - type: load_15m
+      - type: memory_use_percent
+  - platform: command_line
+    name: "CPU Temperature"
+    command: "cat /sys/class/thermal/thermal_zone0/temp"
+    value_template: '{{ value | multiply(0.001) | round(1) }}'
+  - platform: rpi_power
+    text_state: true
+  - platform: filesize
+    file_paths:
+      - /config/home-assistant_v2.db
+
+weather:
+  - platform: darksky
+    api_key: !secret darksky_api_key
+
+speedtestdotnet:
+
+# Text to speech
+tts:
+  - platform: google_translate
+    service_name: google_say
+
+# Cloud
+cloud:
+  google_actions:
+    filter:
+      include_domains:
+        - switch
+        - light
+
+# LIFX lights
+lifx:
+
+# Zwave - disable until I have things that use this
+#zwave:
+#  usb_path: /dev/ttyACM0
+
+# TPLink plugs
+tplink:
+    discovery: false
+    switch:
+    - host: 192.168.1.201
+
+
+switch:
+  - platform: command_line # Pi-Hole switch
+    switches:
+      pihole_switch:
+        command_on: "curl -X GET 'http://localhost:4865/admin/api.php?enable&auth='"
+        command_off: "curl -X GET 'http://localhost:4865/admin/api.php?disable=3600&auth='"
+        command_state: "curl -X GET 'http://localhost:4865/admin/api.php?status'"
+        value_template: "{{ value_json.status == 'enabled' }}"
+
+# Disabled as this polls the nuts off the car preventing it from sleeping so munches battery, which I don't want as I don't have a charger at home yet.
+#tesla:
+#  username: !secret tesla_username
+#  password: !secret tesla_password
+#  scan_interval: 86400
+
+# HACS - https://hacs.netlify.com/
+# The token is a github PAC
+hacs:
+  token: !secret hacs_token
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
