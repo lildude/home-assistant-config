@@ -1,0 +1,6 @@
+media_player.roku_2md574023272:
+  friendly_name: Roku Stick
+switch.standard_lamp:
+  icon: mdi:floor-lamp
+person.colin_2:
+  entity_picture: "/local/imgs/colin.png"
